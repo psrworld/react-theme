@@ -1,18 +1,16 @@
 # react-theme
 
-A comprehensive React theme management library with TypeScript support for dark, light, and system modes.
+A comprehensive theme provider for React applications with dark/light/system mode support. Built with TypeScript and designed to work seamlessly with Tailwind CSS.
 
 ## Features
 
-- 🌙 **Dark/Light/System modes** - Support for all three theme modes
-- 🎨 **Tailwind CSS integration** - Built-in support for Tailwind CSS classes
-- 🔧 **TypeScript support** - Full TypeScript definitions included
-- 🚀 **SSR friendly** - Works with Next.js and other SSR frameworks
-- 💾 **Persistent storage** - Automatically saves theme preference
-- 🎯 **Multiple toggle components** - Button, dropdown, and text variants
-- 🛠️ **Customizable** - Extensive configuration options
-- 🔄 **System theme detection** - Automatically detects system preference
-- ⚡ **Lightweight** - Minimal bundle size with no external dependencies
+- 🌙 **Dark/Light/System themes** - Complete theme switching with system preference detection
+- 🎨 **Tailwind CSS integration** - Works perfectly with Tailwind's dark mode
+- 💾 **Persistent storage** - Remembers user preference with localStorage
+- 🔄 **System theme detection** - Automatically follows system dark/light preference
+- 🎯 **TypeScript support** - Fully typed with comprehensive type definitions
+- 📱 **Responsive design** - Works on all screen sizes
+- 🎛️ **Customizable components** - Flexible ThemeToggle component with multiple variants
 
 ## Installation
 
@@ -20,363 +18,390 @@ A comprehensive React theme management library with TypeScript support for dark,
 npm install react-theme
 ```
 
-```bash
-yarn add react-theme
-```
-
-```bash
-pnpm add react-theme
-```
-
 ## Quick Start
 
-1. Wrap your app with `ThemeProvider`:
+### 1. Wrap your app with ThemeProvider
 
 ```tsx
-import { ThemeProvider } from 'react-theme';
+import React from 'react';
+import { ThemeProvider, ThemeToggle } from 'react-theme';
 
 function App() {
   return (
-    <ThemeProvider>
-      <YourApp />
+    <ThemeProvider defaultTheme="system" storageKey="app-theme">
+      <div className="min-h-screen bg-white dark:bg-gray-900">
+        <header className="p-4">
+          <ThemeToggle ThemeLabel={true} ThemeIcon={true} />
+        </header>
+        
+        <main className="p-6">
+          <div className="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+            <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+              Your Content
+            </h5>
+            <p className="font-normal text-gray-700 dark:text-gray-400">
+              This content will automatically adapt to the selected theme.
+            </p>
+          </div>
+        </main>
+      </div>
     </ThemeProvider>
   );
 }
 ```
 
-2. Add the theme toggle component:
-
-```tsx
-import { ThemeToggle } from 'react-theme';
-
-function Header() {
-  return (
-    <header>
-      <h1>My App</h1>
-      <ThemeToggle />
-    </header>
-  );
-}
-```
-
-3. Use the theme in your components:
-
-```tsx
-import { useTheme } from 'react-theme';
-
-function MyComponent() {
-  const { theme, mode, setMode } = useTheme();
-  
-  return (
-    <div className={`p-4 ${theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
-      <p>Current theme: {theme}</p>
-      <p>Current mode: {mode}</p>
-    </div>
-  );
-}
-```
-
-## Configuration
-
-### ThemeProvider Props
-
-```tsx
-interface ThemeProviderProps {
-  children: React.ReactNode;
-  defaultMode?: 'light' | 'dark' | 'system'; // default: 'system'
-  storageKey?: string; // default: 'psr-theme'
-  attribute?: string; // default: 'class'
-  themes?: Record<string, string>; // custom themes
-  disableTransitions?: boolean; // default: false
-  enableSystem?: boolean; // default: true
-  storageProvider?: Storage; // default: localStorage
-}
-```
-
-### Example with custom configuration:
-
-```tsx
-<ThemeProvider
-  defaultMode="light"
-  storageKey="my-app-theme"
-  attribute="data-theme"
-  disableTransitions={true}
->
-  <App />
-</ThemeProvider>
-```
-
-## Theme Toggle Components
-
-### 1. ThemeToggle (Button)
-
-```tsx
-import { ThemeToggle } from 'react-theme';
-
-<ThemeToggle
-  size="md" // 'sm' | 'md' | 'lg'
-  variant="default" // 'default' | 'outline' | 'ghost'
-  showLabels={true}
-  className="custom-class"
-  onThemeChange={(mode) => console.log('Theme changed to:', mode)}
-/>
-```
-
-### 2. ThemeToggleDropdown
-
-```tsx
-import { ThemeToggleDropdown } from 'react-theme';
-
-<ThemeToggleDropdown
-  size="md"
-  variant="outline"
-  labels={{
-    light: 'Light Mode',
-    dark: 'Dark Mode',
-    system: 'Auto'
-  }}
-/>
-```
-
-### 3. ThemeToggleText
-
-```tsx
-import { ThemeToggleText } from 'react-theme';
-
-<ThemeToggleText
-  labels={{
-    light: '☀️ Light',
-    dark: '🌙 Dark',
-    system: '💻 System'
-  }}
-/>
-```
-
-## useTheme Hook
-
-```tsx
-import { useTheme } from 'react-theme';
-
-function MyComponent() {
-  const {
-    mode,        // Current theme mode: 'light' | 'dark' | 'system'
-    theme,       // Resolved theme: 'light' | 'dark'
-    setMode,     // Function to change theme mode
-    toggleTheme, // Function to toggle between light/dark
-    systemTheme, // System theme preference
-    modes,       // Available theme modes
-    isLoading    // Loading state
-  } = useTheme();
-
-  return (
-    <div>
-      <p>Mode: {mode}</p>
-      <p>Theme: {theme}</p>
-      <button onClick={() => setMode('dark')}>Dark Mode</button>
-      <button onClick={toggleTheme}>Toggle Theme</button>
-    </div>
-  );
-}
-```
-
-## Utility Functions
-
-```tsx
-import {
-  getSystemTheme,
-  resolveTheme,
-  getStoredTheme,
-  setStoredTheme,
-  applyTheme,
-  getThemeVariables
-} from 'react-theme';
-
-// Get system theme preference
-const systemTheme = getSystemTheme(); // 'light' | 'dark'
-
-// Resolve theme mode to actual theme
-const resolvedTheme = resolveTheme('system'); // 'light' | 'dark'
-
-// Get CSS variables for theme
-const variables = getThemeVariables('dark');
-```
-
-## Tailwind CSS Setup
+### 2. Configure Tailwind CSS
 
 Add the following to your `tailwind.config.js`:
 
 ```js
 module.exports = {
   darkMode: 'class',
-  content: [
-    './src/**/*.{js,ts,jsx,tsx}',
-    './node_modules/react-theme/dist/**/*.{js,ts,jsx,tsx}'
-  ],
-  theme: {
-    extend: {}
-  },
-  plugins: []
+  // ... rest of your config
 }
 ```
 
-## CSS Variables
+## API Reference
 
-The library automatically sets CSS variables for consistent theming:
+### ThemeProvider
+
+The main provider component that manages theme state and persistence.
+
+#### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `children` | `React.ReactNode` | - | Child components |
+| `defaultTheme` | `'light' \| 'dark' \| 'system'` | `'system'` | Default theme when no stored preference |
+| `storageKey` | `string` | `'psr-theme'` | localStorage key for persisting theme |
+| `attribute` | `string` | `'class'` | HTML attribute to set theme |
+| `enableSystem` | `boolean` | `true` | Enable system theme detection |
+
+### ThemeToggle
+
+A ready-to-use theme toggle button component.
+
+#### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `ThemeLabel` | `boolean` | `true` | Show theme label text |
+| `ThemeIcon` | `boolean` | `true` | Show theme icon |
+| `className` | `string` | `''` | Additional CSS classes |
+| `variant` | `'default' \| 'outline' \| 'ghost'` | `'outline'` | Button style variant |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Button size |
+
+### useTheme Hook
+
+Access and control theme state from any component.
+
+```tsx
+import { useTheme } from 'react-theme';
+
+function MyComponent() {
+  const { theme, setTheme, resolvedTheme, toggleTheme } = useTheme();
+  
+  return (
+    <div>
+      <p>Current theme: {theme}</p>
+      <p>Resolved theme: {resolvedTheme}</p>
+      <button onClick={toggleTheme}>Toggle Theme</button>
+    </div>
+  );
+}
+```
+
+#### Returns
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `theme` | `'light' \| 'dark' \| 'system'` | Current theme setting |
+| `setTheme` | `(theme: Theme) => void` | Function to change theme |
+| `resolvedTheme` | `'light' \| 'dark'` | Actual theme being used |
+| `systemTheme` | `'light' \| 'dark'` | Current system theme |
+| `toggleTheme` | `() => void` | Cycle through themes |
+| `isSystemTheme` | `boolean` | Whether system theme is active |
+
+## Theme Variants
+
+### ThemeToggle Variants
+
+```tsx
+// Default variant
+<ThemeToggle variant="default" />
+
+// Outline variant (recommended)
+<ThemeToggle variant="outline" />
+
+// Ghost variant
+<ThemeToggle variant="ghost" />
+```
+
+### ThemeToggle Sizes
+
+```tsx
+// Small
+<ThemeToggle size="sm" />
+
+// Medium (default)
+<ThemeToggle size="md" />
+
+// Large
+<ThemeToggle size="lg" />
+```
+
+## CSS Integration
+
+The theme provider automatically applies the following:
+
+1. **CSS Classes**: Adds `light` or `dark` class to `<html>` element
+2. **Data Attribute**: Sets `data-theme` attribute
+3. **Color Scheme**: Updates CSS `color-scheme` property
+
+### Custom CSS
+
+You can use standard CSS with the theme classes:
 
 ```css
+/* Light theme styles */
+.light .my-component {
+  background-color: white;
+  color: black;
+}
+
+/* Dark theme styles */
+.dark .my-component {
+  background-color: #1a1a1a;
+  color: white;
+}
+
+/* Or using CSS custom properties */
 :root {
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-  --primary: 222.2 47.4% 11.2%;
-  /* ... more variables */
+  --bg-color: white;
+  --text-color: black;
 }
 
 .dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-  --primary: 210 40% 98%;
-  /* ... more variables */
+  --bg-color: #1a1a1a;
+  --text-color: white;
+}
+
+.my-component {
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 ```
 
-## Next.js Integration
+## Advanced Usage
 
-For Next.js, you might want to prevent hydration mismatches:
+### Custom Theme Toggle
+
+Create your own theme toggle component:
 
 ```tsx
-// _app.tsx
+import React from 'react';
+import { useTheme } from 'react-theme';
+
+function CustomThemeToggle() {
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  
+  return (
+    <div className="flex gap-2">
+      <button
+        onClick={() => setTheme('light')}
+        className={`px-3 py-1 rounded ${
+          theme === 'light' ? 'bg-blue-500 text-white' : 'bg-gray-200'
+        }`}
+      >
+        Light
+      </button>
+      <button
+        onClick={() => setTheme('dark')}
+        className={`px-3 py-1 rounded ${
+          theme === 'dark' ? 'bg-blue-500 text-white' : 'bg-gray-200'
+        }`}
+      >
+        Dark
+      </button>
+      <button
+        onClick={() => setTheme('system')}
+        className={`px-3 py-1 rounded ${
+          theme === 'system' ? 'bg-blue-500 text-white' : 'bg-gray-200'
+        }`}
+      >
+        System
+      </button>
+    </div>
+  );
+}
+```
+
+### Theme-aware Components
+
+Create components that adapt to theme changes:
+
+```tsx
+import React from 'react';
+import { useTheme } from 'react-theme';
+
+function ThemeAwareComponent() {
+  const { resolvedTheme } = useTheme();
+  
+  return (
+    <div className={`p-4 rounded-lg ${
+      resolvedTheme === 'dark' 
+        ? 'bg-gray-800 text-white' 
+        : 'bg-white text-gray-900'
+    }`}>
+      <h3>Current theme: {resolvedTheme}</h3>
+      <p>This component adapts to the current theme.</p>
+    </div>
+  );
+}
+```
+
+### Server-Side Rendering (SSR)
+
+For SSR applications, you might want to prevent hydration mismatches:
+
+```tsx
+import React, { useEffect, useState } from 'react';
 import { ThemeProvider } from 'react-theme';
 
-function MyApp({ Component, pageProps }) {
+function App() {
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  if (!mounted) {
+    return <div>Loading...</div>;
+  }
+  
   return (
-    <ThemeProvider attribute="class" defaultMode="system">
-      <Component {...pageProps} />
+    <ThemeProvider>
+      {/* Your app content */}
     </ThemeProvider>
   );
 }
 ```
 
-Add to your `_document.tsx`:
+## Utilities
+
+The package also exports utility functions for advanced use cases:
 
 ```tsx
-import { Html, Head, Main, NextScript } from 'next/document';
+import {
+  getSystemTheme,
+  getStoredTheme,
+  setStoredTheme,
+  applyTheme,
+  getThemeLabel,
+  getNextTheme
+} from 'react-theme';
 
-export default function Document() {
+// Get current system theme
+const systemTheme = getSystemTheme(); // 'light' | 'dark'
+
+// Get stored theme from localStorage
+const storedTheme = getStoredTheme('my-theme-key');
+
+// Store theme in localStorage
+setStoredTheme('dark', 'my-theme-key');
+
+// Apply theme to DOM
+applyTheme('dark', 'light', 'class');
+
+// Get human-readable theme label
+const label = getThemeLabel('system'); // 'System mode'
+
+// Get next theme in cycle
+const nextTheme = getNextTheme('light'); // 'dark'
+```
+
+## Examples
+
+### Basic Setup
+
+```tsx
+import React from 'react';
+import { ThemeProvider, ThemeToggle } from 'react-theme';
+
+function App() {
   return (
-    <Html>
-      <Head />
-      <body>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                if (localStorage.getItem('psr-theme') === 'dark' || 
-                    (!localStorage.getItem('psr-theme') && 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                  document.documentElement.classList.add('dark');
-                } else {
-                  document.documentElement.classList.remove('dark');
-                }
-              } catch (_) {}
-            `,
-          }}
-        />
-        <Main />
-        <NextScript />
-      </body>
-    </Html>
+    <ThemeProvider>
+      <div className="min-h-screen bg-white dark:bg-gray-900">
+        <nav className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex justify-between items-center">
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+              My App
+            </h1>
+            <ThemeToggle />
+          </div>
+        </nav>
+        
+        <main className="p-6">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+              Welcome to My App
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300">
+              This app supports light, dark, and system themes.
+            </p>
+          </div>
+        </main>
+      </div>
+    </ThemeProvider>
   );
 }
 ```
 
+### Icon-only Toggle
+
+```tsx
+<ThemeToggle ThemeLabel={false} ThemeIcon={true} variant="ghost" size="sm" />
+```
+
+### Label-only Toggle
+
+```tsx
+<ThemeToggle ThemeLabel={true} ThemeIcon={false} variant="outline" />
+```
+
+### Custom Styling
+
+```tsx
+<ThemeToggle 
+  className="border-2 border-blue-500 hover:border-blue-600" 
+  variant="outline"
+  size="lg"
+/>
+```
+
 ## TypeScript Support
 
-The library is fully typed with TypeScript. All components and hooks include proper type definitions.
+The package is fully typed with comprehensive TypeScript definitions:
 
 ```tsx
-import type { ThemeMode, ResolvedTheme, ThemeConfig } from 'react-theme';
+import type { 
+  Theme, 
+  ThemeContextType, 
+  ThemeProviderProps, 
+  ThemeToggleProps, 
+  UseThemeReturn 
+} from 'react-theme';
 
-const config: ThemeConfig = {
-  defaultMode: 'system',
-  storageKey: 'my-theme',
-  enableSystem: true
-};
+// All types are available for your use
+const myTheme: Theme = 'dark';
 ```
 
-## Custom Icons
+## Browser Support
 
-You can provide custom icons for the theme toggle:
-
-```tsx
-import { ThemeToggle } from 'react-theme';
-import { Sun, Moon, Monitor } from 'lucide-react';
-
-<ThemeToggle
-  icons={{
-    light: <Sun size={16} />,
-    dark: <Moon size={16} />,
-    system: <Monitor size={16} />
-  }}
-  labels={{
-    light: 'Light Theme',
-    dark: 'Dark Theme',
-    system: 'System Theme'
-  }}
-/>
-```
-
-## Advanced Usage
-
-### Higher-Order Component
-
-```tsx
-import { withTheme } from 'react-theme';
-
-const MyComponent = withTheme(({ theme }) => (
-  <div className={theme === 'dark' ? 'dark-styles' : 'light-styles'}>
-    Content
-  </div>
-));
-```
-
-### Custom Storage Provider
-
-```tsx
-// Using sessionStorage instead of localStorage
-<ThemeProvider storageProvider={sessionStorage}>
-  <App />
-</ThemeProvider>
-```
-
-### Theme Change Callbacks
-
-```tsx
-<ThemeToggle
-  onThemeChange={(mode) => {
-    console.log('Theme changed to:', mode);
-    // Analytics, logging, etc.
-  }}
-/>
-```
-
-## API Reference
-
-### Types
-
-```typescript
-type ThemeMode = 'light' | 'dark' | 'system';
-type ResolvedTheme = 'light' | 'dark';
-
-interface ThemeContextValue {
-  mode: ThemeMode;
-  theme: ResolvedTheme;
-  setMode: (mode: ThemeMode) => void;
-  toggleTheme: () => void;
-  systemTheme: ResolvedTheme;
-  modes: ThemeMode[];
-  isLoading: boolean;
-}
-```
+- Chrome 76+
+- Firefox 67+
+- Safari 12.1+
+- Edge 79+
 
 ## Contributing
 
@@ -384,8 +409,16 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-MIT License - see LICENSE file for details.
+MIT License
 
-## Support
+## Changelog
 
-For issues and questions, please visit our [GitHub repository](https://github.com/psr-world/react-theme).
+### v1.0.0
+- Initial release
+- ThemeProvider component
+- ThemeToggle component
+- useTheme hook
+- Full TypeScript support
+- Tailwind CSS integration
+- System theme detection
+- localStorage persistence
